@@ -10,9 +10,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash
+    command: foreman start -f Procfile.dev -p 3000
     volumes:
       - .:/project
+      - type: tmpfs
+        target: /project/tmp/pids/
     ports:
       - "3000:3000"
       - "35729:35729"
