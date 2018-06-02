@@ -15,11 +15,12 @@ class VisitsController < ApplicationController
 
   # POST /visits
   def create
+    #TODO unique visitor ip hash anonymous
     @visit = Visit.new(visit_params)
     @visit.browser=request.env["HTTP_USER_AGENT"]
     @visit.domain=request.env["HTTP_ORIGIN"]
     path=request.env["HTTP_REFERER"]
-    path.slice!(@visit.domain)
+    path.slice!(@visit[:domain])
     @visit.path=path
     ip=request.remote_ip.split('.',3)
     @visit.ip="#{ip.first}.#{ip[1]}.1.1"
