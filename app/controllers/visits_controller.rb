@@ -16,6 +16,11 @@ class VisitsController < ApplicationController
   # POST /visits
   def create
     @visit = Visit.new(visit_params)
+    @visit.browser=request.env["HTTP_USER_AGENT"]
+    @visit.domain=request.env["HTTP_ORIGIN"]
+    path=request.env["HTTP_REFERER"]
+    path.slice!(@visit.domain)
+    @visit.path=path
     ip=request.remote_ip.split('.',3)
     @visit.ip="#{ip.first}.#{ip[1]}.1.1"
     if @visit.save
@@ -27,7 +32,7 @@ class VisitsController < ApplicationController
 
   # PATCH/PUT /visits/1
   def update
-    if @visit.update(visit_params)
+    if @visit.update({:retention=>visit_params[:retention]})
       render json: @visit
     else
       render json: @visit.errors, status: :unprocessable_entity
@@ -47,6 +52,8 @@ class VisitsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def visit_params
-      params.require(:visit).permit(:url, :ip, :device, :country, :referer, :keyword, :bounce, :retention, :browser, :version)
+      # :ip removed from this list as it is taken from the backend
+      # using request.remote_ip
+      params.require(:visit).permit(:domain, :path, :device, :country, :referer, :keyword, :bounce, :retention, :browser, :version)
     end
 end
