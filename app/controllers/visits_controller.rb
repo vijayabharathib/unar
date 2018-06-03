@@ -3,8 +3,11 @@ class VisitsController < ApplicationController
 
   # GET /visits
   def index
-    @visits = Visit.total_visit_by_url
-
+    unless params[:domain].nil?
+      @visits = Visit.by_domain(params[:domain]).group_by_date
+    else 
+      @visits = Visit.group_by_path
+    end 
     render json: @visits
   end
 
@@ -17,13 +20,6 @@ class VisitsController < ApplicationController
   def create
     #TODO unique visitor ip hash anonymous
     @visit = Visit.new(visit_params)
-    @visit.browser=request.env["HTTP_USER_AGENT"]
-    @visit.domain=request.env["HTTP_ORIGIN"]
-    path=request.env["HTTP_REFERER"]
-    path.slice!(@visit[:domain])
-    @visit.path=path
-    ip=request.remote_ip.split('.',3)
-    @visit.ip="#{ip.first}.#{ip[1]}.1.1"
     if @visit.save
       render json: @visit, status: :created, location: @visit
     else
@@ -55,6 +51,18 @@ class VisitsController < ApplicationController
     def visit_params
       # :ip removed from this list as it is taken from the backend
       # using request.remote_ip
-      params.require(:visit).permit(:domain, :path, :device, :country, :referer, :keyword, :bounce, :retention, :browser, :version)
+      p=params.require(:visit).permit(:id,:referer, :keyword, :retention)
+      
+      # prepare rest of the parameters from request object
+      p[:browser]=request.env["HTTP_USER_AGENT"]
+      domain=request.env["HTTP_ORIGIN"]
+      path=request.env["HTTP_REFERER"]
+      path.slice!(domain)
+      x=domain.index(/\/\//)+2
+      p[:domain]=domain[x..-1]
+      p[:path]=path
+      ip=request.remote_ip.split('.',3)
+      p[:ip]="#{ip.first}.#{ip[1]}.1.1"
+      return p
     end
 end
