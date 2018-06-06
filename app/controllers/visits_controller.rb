@@ -15,7 +15,7 @@ class VisitsController < ApplicationController
     elsif !params[:domain].nil?
       @visits = Visit.by_domain(params[:domain]).group_by_date
     else
-      @visits=nil
+      @visits=Visit.group_by_date
     end 
     render json: @visits
   end
