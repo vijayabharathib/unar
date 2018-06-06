@@ -3,10 +3,19 @@ class VisitsController < ApplicationController
 
   # GET /visits
   def index
-    unless params[:domain].nil?
+    if !params[:group].nil? 
+      by=params[:group]
+      if by=="country"
+        @visits=Visit.group(by).count('id')
+      elsif by=="path"
+        @visits=Visit.group(by).count('id')
+      else
+        @visits=nil
+      end
+    elsif !params[:domain].nil?
       @visits = Visit.by_domain(params[:domain]).group_by_date
-    else 
-      @visits = Visit.group_by_path
+    else
+      @visits=nil
     end 
     render json: @visits
   end
