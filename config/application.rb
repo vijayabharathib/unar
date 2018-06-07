@@ -36,6 +36,11 @@ module Project
         origins Rails.application.credentials[Rails.env.to_sym][:allowed_origins]
         resource '*', headers: :any, methods: [:get, :post, :put, :options]
       end
+
+      allow do
+        origins '*'
+        resource '*', headers: :any, methods: [:get]
+      end
     end
   end
 end
