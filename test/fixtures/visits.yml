@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  domain: firstURL
+  path: firstPath
+  ip: MyString
+  device: MyString
+  country: MyString
+  referer: MyString
+  keyword: MyString
+  bounce: false
+  retention: 1
+  browser: MyString
+  version: MyString
+
+two:
+  domain: firstURL
+  path: firstPath
+  ip: MyString
+  device: MyString
+  country: MyString
+  referer: MyString
+  keyword: MyString
+  bounce: false
+  retention: 1
+  browser: MyString
+  version: MyString

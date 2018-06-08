@@ -31,5 +31,16 @@ module Project
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+    config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins Rails.application.credentials[Rails.env.to_sym][:allowed_origins]
+        resource '*', headers: :any, methods: [:get, :post, :put, :options]
+      end
+
+      allow do
+        origins '*'
+        resource '*', headers: :any, methods: [:get]
+      end
+    end
   end
 end
