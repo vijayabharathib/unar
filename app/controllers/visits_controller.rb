@@ -5,10 +5,10 @@ class VisitsController < ApplicationController
   def index
     if !params[:group].nil? 
       by=params[:group]
-      if by=="country"
+      if by=="country" || by=="path" || by=="referer" || by=="browser"
         @visits=Visit.group(by).count('id')
-      elsif by=="path"
-        @visits=Visit.group(by).count('id')
+      elsif by=="week"
+        @visits=Visit.by_week
       else
         @visits=nil
       end
@@ -27,7 +27,8 @@ class VisitsController < ApplicationController
 
   # POST /visits
   def create
-    #TODO unique visitor ip hash anonymous
+    # hashed_ip=BCrypt::Password.create(visit_params[:ip])
+    # @visitor=Visitor.find_or_create_by(identity: hashed_ip.to_s)
     @visit = Visit.new(visit_params)
     if @visit.save
       render json: @visit, status: :created, location: @visit
