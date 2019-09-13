@@ -1,6 +1,6 @@
 module CountryHelper
     def self.fetchCountryDetails
-        @ips=Visit.where(country:nil).distinct.pluck(:ip)
+        @ips=Visit.where(country:nil).or(Visit.where(country:"")).distinct.pluck(:ip)
         @ips.each do |ip|
           url="https://ipinfo.io/#{ip}?"
           url=url+"token=#{Rails.application.credentials.ipinfo[:api_token]}"
