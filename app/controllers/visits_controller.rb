@@ -36,7 +36,8 @@ class VisitsController < ApplicationController
     if @visit.save
       render json: @visit, status: :created, location: @visit
     else
-      render json: @visit.errors, status: :unprocessable_entity
+      render json: @visit, status: :accepted, location: @visit
+      # render json: @visit.errors, status: :unprocessable_entity
     end
   end
 
