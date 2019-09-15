@@ -13,9 +13,9 @@ class Visit < ApplicationRecord
             visit_time ||= Time.now
             domain.sub!(/^www\./, '')
             doc_ref = firestore.col(domain).doc("nested").col("days").doc(visit_time.strftime('%Y%m%d')).col("visits").doc(visit_time.strftime('%H%M%S%6N'))
-            doc_ref.set(domain: domain, ip: ip, device: device, country: country, referer: referer, keyword: keyword, bounce: bounce, retention: retention, browser: browser, version: version, path: path)
+            doc_ref.set(id: id,domain: domain, ip: ip, device: device, country: country, referer: referer, keyword: keyword, bounce: bounce, retention: retention, browser: browser, version: version, path: path)
             doc_ref = firestore.col(domain).doc("flat").col("visits").doc(visit_time.strftime('%Y%m%d%H%M%S%6N'))
-            doc_ref.set(domain: domain, ip: ip, device: device, country: country, referer: referer, keyword: keyword, bounce: bounce, retention: retention, browser: browser, version: version, path: path,created_at: visit_time)
+            doc_ref.set(id: id, domain: domain, ip: ip, device: device, country: country, referer: referer, keyword: keyword, bounce: bounce, retention: retention, browser: browser, version: version, path: path,created_at: visit_time)
             puts "Created a document for visit id: #{id} ; time: #{visit_time.strftime('%Y%m%d%H%M%S%6N')}"
         rescue StandardError => e
             puts "Error writing #{self} to firestore: #{e}"
