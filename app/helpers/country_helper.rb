@@ -1,16 +1,20 @@
 module CountryHelper
     def self.fetchCountryDetails
-        @ips=Visit.distinct.pluck(:ip)
+        @ips=Visit.where(country:nil).or(Visit.where(country:"")).distinct.pluck(:ip)
         @ips.each do |ip|
           url="https://ipinfo.io/#{ip}?"
           url=url+"token=#{Rails.application.credentials.ipinfo[:api_token]}"
           uri=URI(url)
-          response=Net::HTTP.get(uri)
-          ipinfo=JSON.parse(response)
-          puts ipinfo
-          country=ipinfo["country"]
-          puts "'#{country}'"
-          Visit.where("ip = ? ",ip).update_all("country='#{country}'")
+          response=Net::HTTP.get_response(uri)
+          if response.code == 200
+            ipinfo=JSON.parse(response)
+            country=ipinfo["country"]
+            Visit.where("ip = ? ",ip).update_all("country='#{country}'")
+          else
+            p "Unable to get IP->Country info: #{response.message}"
+          end
+
+          break if response.code != 200
         end
     end
 end
