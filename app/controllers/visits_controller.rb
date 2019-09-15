@@ -30,6 +30,9 @@ class VisitsController < ApplicationController
     # hashed_ip=BCrypt::Password.create(visit_params[:ip])
     # @visitor=Visitor.find_or_create_by(identity: hashed_ip.to_s)
     @visit = Visit.new(visit_params)
+
+    @visit.push_to_firestore 
+
     if @visit.save
       render json: @visit, status: :created, location: @visit
     else
@@ -65,11 +68,10 @@ class VisitsController < ApplicationController
       
       # prepare rest of the parameters from request object
       p[:browser]=request.env["HTTP_USER_AGENT"]
-      domain=request.env["HTTP_ORIGIN"]
+      domain=request.env['HTTP_ORIGIN']
       path=request.env["HTTP_REFERER"]
       path.slice!(domain)
-      x=domain.index(/\/\//)+2
-      p[:domain]=domain[x..-1]
+      p[:domain]=URI.parse(domain).host.sub(/^www\./, '')
       p[:path]=path
       ip=request.remote_ip.split('.',3)
       p[:ip]="#{ip.first}.#{ip[1]}.1.1"
