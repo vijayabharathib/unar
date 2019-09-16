@@ -1,5 +1,5 @@
 class VisitsController < ApplicationController
-  before_action :set_visit, only: [:show, :update, :destroy]
+  # before_action :set_visit, only: [:show, :update, :destroy]
 
   # GET /visits
   def index
@@ -30,23 +30,27 @@ class VisitsController < ApplicationController
     # hashed_ip=BCrypt::Password.create(visit_params[:ip])
     # @visitor=Visitor.find_or_create_by(identity: hashed_ip.to_s)
     @visit = Visit.new(visit_params)
-
-    @visit.push_to_firestore 
-
-    if @visit.save
-      render json: @visit, status: :created, location: @visit
-    else
-      render json: @visit.errors, status: :unprocessable_entity
-    end
+    visit_time=@visit.push_to_firestore 
+    @visit.created_at = visit_time
+    render json: @visit, status: :created, location: @visit
+    # if @visit.save
+    #   render json: @visit, status: :created, location: @visit
+    # else
+    #   render json: @visit, status: :accepted, location: @visit
+    #   # render json: @visit.errors, status: :unprocessable_entity
+    # end
   end
 
   # PATCH/PUT /visits/1
   def update
-    if @visit.update({:retention=>visit_params[:retention]})
-      render json: @visit
-    else
-      render json: @visit.errors, status: :unprocessable_entity
-    end
+    @visit = Visit.new(visit_params)
+    @visit.push_to_firestore
+    render json: @visit 
+    # if @visit.update({:retention=>visit_params[:retention]})
+    #   render json: @visit
+    # else
+    #   render json: @visit.errors, status: :unprocessable_entity
+    # end
   end
 
   # DELETE /visits/1
@@ -64,7 +68,7 @@ class VisitsController < ApplicationController
     def visit_params
       # :ip removed from this list as it is taken from the backend
       # using request.remote_ip
-      p=params.require(:visit).permit(:id,:referer, :keyword, :retention)
+      p=params.require(:visit).permit(:id,:referer, :keyword, :retention,:created_at)
       
       # prepare rest of the parameters from request object
       p[:browser]=request.env["HTTP_USER_AGENT"]
