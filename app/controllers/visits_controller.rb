@@ -32,25 +32,25 @@ class VisitsController < ApplicationController
     @visit = Visit.new(visit_params)
     visit_time=@visit.push_to_firestore 
     @visit.created_at = visit_time
-    render json: @visit, status: :created, location: @visit
-    # if @visit.save
-    #   render json: @visit, status: :created, location: @visit
-    # else
-    #   render json: @visit, status: :accepted, location: @visit
-    #   # render json: @visit.errors, status: :unprocessable_entity
-    # end
+
+    begin
+      @visit.save  
+      render json: @visit, status: :created, location: @visit
+    rescue 
+      render json: @visit, status: :accepted, location: @visit
+    end
   end
 
   # PATCH/PUT /visits/1
   def update
-    @visit = Visit.new(visit_params)
+    begin 
+      set_visit
+      @visit.update({:retention=>visit_params[:retention]})
+    rescue
+      @visit = Visit.new(visit_params)
+    end
     @visit.push_to_firestore
     render json: @visit 
-    # if @visit.update({:retention=>visit_params[:retention]})
-    #   render json: @visit
-    # else
-    #   render json: @visit.errors, status: :unprocessable_entity
-    # end
   end
 
   # DELETE /visits/1
