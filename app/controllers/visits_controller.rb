@@ -58,6 +58,18 @@ class VisitsController < ApplicationController
     @visit.destroy
   end
 
+  def vacuum 
+    if Visit.all.count > 8000
+      max_id = Visit.limit(1).offset(1000)[0].id 
+      Visit.where("id < ?",max_id).delete_all 
+      response = { delete: 'success' }
+      render json: response
+    else
+      response = { delete: 'rows-within-threshold'}
+      render json: response, status: :not_modified 
+    end
+  end 
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_visit
