@@ -1,0 +1,2 @@
+class CountryMap < ApplicationRecord
+end

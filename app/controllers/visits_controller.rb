@@ -27,16 +27,17 @@ class VisitsController < ApplicationController
 
   # POST /visits
   def create
-    # hashed_ip=BCrypt::Password.create(visit_params[:ip])
-    # @visitor=Visitor.find_or_create_by(identity: hashed_ip.to_s)
+    country = CountryMap.find_by(ip: visit_params['ip'])
     @visit = Visit.new(visit_params)
-    visit_time=@visit.push_to_firestore 
-    @visit.created_at = visit_time
-
+    @visit.country = country.country unless country.nil?
+    
     begin
       @visit.save  
+      @visit.push_to_firestore 
       render json: @visit, status: :created, location: @visit
     rescue 
+      visit_time=@visit.push_to_firestore 
+      @visit.created_at = visit_time
       render json: @visit, status: :accepted, location: @visit
     end
   end
@@ -49,7 +50,7 @@ class VisitsController < ApplicationController
     rescue
       @visit = Visit.new(visit_params)
     end
-    @visit.push_to_firestore
+    @visit.push_to_firestore if @visit.id.nil? 
     render json: @visit 
   end
 
