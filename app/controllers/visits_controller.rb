@@ -27,9 +27,8 @@ class VisitsController < ApplicationController
 
   # POST /visits
   def create
-    country = CountryMap.find_by(ip: visit_params['ip'])
     @visit = Visit.new(visit_params)
-    @visit.country = country.country unless country.nil?
+    @visit.country = CountryHelper.find_or_create_ip_info(visit_params['ip'])
     
     begin
       @visit.save  
